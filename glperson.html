@@ -1,0 +1,500 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<!--
+An element providing a solution to no problem in particular.
+Example:
+    <glperson-element></glperson-element>
+@demo
+-->
+<dom-module id="glperson-element">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js" crossorigin="anonymous"></script>
+    <link rel="import" href="/themes/whoas-m2/geoLinkComponent/geocomponent/components/glperson-element/bower_components/polymer/polymer.html">
+    <link rel="import" href="/themes/whoas-m2/geoLinkComponent/geocomponent/components/glperson-element/bower_components/iron-ajax/iron-ajax.html">
+    <link rel="import" href="/themes/whoas-m2/geoLinkComponent/geocomponent/components/glperson-element/bower_components/iron-overlay-behavior/iron-overlay-behavior.html">
+    <!-- Material Design Light -->
+    <!--<link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.6/material.indigo-pink.min.css"> -->
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" integrity="sha384-aUGj/X2zp5rLCbBxumKTCw2Z50WgIr1vs/PFN4praOTvYXWlVyh2UtNUU0KAUhAX" crossorigin="anonymous">
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>
+
+  <style is="custom-style">
+    iron-overlay-backdrop {
+      --iron-overlay-backdrop-opacity: 0.9;
+      --iron-overlay-backdrop-background-color: #222;
+    }
+    .geolink-section-collapsed {
+      background-image: url(/misc/menu-collapsed.png);
+      background-position: 0px;
+      background-repeat: no-repeat;
+      padding-left: 18px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+    .geolink-section-expanded {
+      background-image: url(/misc/menu-expanded.png);
+      background-position: 0px;
+      background-repeat: no-repeat;
+      padding-left: 18px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+  </style>
+
+    <template>
+        <!--iron-ajax id="awards"
+                   auto
+                   url="http://geolink.bco-dmo.org/sparql"
+                   content-type="application/x-www-form-urlencoded"
+                   method="POST"
+                   body='{{getAwardQuery()}}'
+                   handle-as="json"
+                   headers='{"Accept": "application/sparql-results+json"}'
+                   debounce-duration="300"
+                   last-response="{{awards}}"></iron-ajax>
+        <iron-ajax id="deployments"
+                   auto
+                   url="http://geolink.bco-dmo.org/sparql"
+                   content-type="application/x-www-form-urlencoded"
+                   method="POST"
+                   body='{{getCruiseQuery()}}'
+                   on-response="handleCruiseInfoResponse"
+                   handle-as="json"
+                   headers='{"Accept": "application/sparql-results+json"}'
+                   debounce-duration="300"></iron-ajax-->
+        <iron-ajax id="publications"
+                   auto
+                   url="https://geolink.bco-dmo.org/sparql"
+                   content-type="application/x-www-form-urlencoded"
+                   method="POST"
+                   body='{{getPublicationsQuery()}}'
+                   handle-as="json"
+                   headers='{"Accept": "application/sparql-results+json"}'
+                   debounce-duration="300"
+                   last-response="{{pubs}}"></iron-ajax>
+
+
+     <!-- set display false for a surrounding div if the ajax response is empty -->
+
+     <div class="container-fluid" style="margin:10px;">
+       <div class="row" >
+         <div class="cols-md-6">
+           <img style="margin:5px;width:75px" src="//glcomponents.tech/components/glperson-element/images/eclogo.png">
+           <h4 style="margin:5px"><a target="_blank" href="{{params.hosturl}}">{{params.host}}</a> Resource Information for:
+             <a target="_blank" href="{{params.url}}">{{params.label}}</a>
+           </h4>
+           <!--template is="dom-if" if="{{showTemplate(deployments)}}">
+             <div id="geolink-people-cruises">
+               <h3 class="geolink-section-expanded" on-tap="handleTap">Cruises ([[deployments.length]])</h3>
+               <table style="margin:10px;width:100%" class="table table-condensed table-hover">
+                <tr><th>Cruise</th><th>Identifier</th><th>Role</th><th>Start Port</th><th>End Port</th></tr>
+               <template is="dom-repeat" items="[[deployments]]">
+                 <tr><td inner-h-t-m-l="{{getCruiseInfo(index, 'name')}}" nowrap></td><td inner-h-t-m-l="{{getCruiseInfo(index, 'id')}}"></td><td inner-h-t-m-l="{{getCruiseInfo(index, 'role')}}"></td><td inner-h-t-m-l="{{getCruiseInfo(index, 'start_port')}}"></td><td inner-h-t-m-l="{{getCruiseInfo(index, 'end_port')}}"></td></tr>
+               </template>
+               </table>
+             </div>
+          </template-->
+          <template is="dom-if" if="{{showTemplate(pubs.results.bindings)}}">
+             <div id="geolink-people-publications">
+               <h3 class="geolink-section-expanded" on-tap="handleTap">Publications ([[pubs.results.bindings.length]])</h3>
+               <table style="margin:10px;width:100%" class="table table-condensed table-hover">
+                 <tr><th>Publication</th><th>Role</th></tr>
+               <template is="dom-repeat" items="[[pubs.results.bindings]]">
+                 <tr><td inner-h-t-m-l="{{getPublicationName(item, index)}}" style="width: 80%"></td><td inner-h-t-m-l="{{getPublicationRole(item)}}"></td></tr>
+               </template>
+               </table>
+            </div>
+          </template>
+           <!--template is="dom-if" if="{{showTemplate(awards.results.bindings)}}">
+             <div id="geolink-people-awards">
+               <h3 class="geolink-section-expanded" on-tap="handleTap">Awards ([[awards.results.bindings.length]])</h3>
+               <table style="margin:10px;width:100%" class="table table-condensed table-hover">
+                 <tr><th>Award</th><th>Sponsor</th></tr>
+               <template is="dom-repeat" items="[[awards.results.bindings]]">
+                 <tr><td>{{indexCounter(index)}}. <strong><a target="_blank" href="[[item.award.value]]">[[item.award_title.value]]</a></strong></td><td>{{computeAwardSponsor(item)}}</td></tr>
+               </template>
+               </table>
+             </div>
+          </template-->
+        </div>
+      </div>
+    </div>
+    </template>
+  <script>
+    Polymer({
+        is: 'glperson-element',
+        properties: {
+            deployments: {
+              type: Array,
+              value: function() { return []; },
+              notify: true
+            },
+            /**
+             * `fancy` indicates that the element should don a monocle and tophat,
+             * while checking its pocket watch.
+             */
+            fancy: Boolean,
+            /**
+             * Describes the author of the element, but is really just an excuse to
+             * show off JSDoc annotations.
+             *
+             * @type {{name: string, image: string}}
+             */
+            params: {
+                type: Object,
+                // Use `value` to provides a default value for a property, by setting it
+                // on your element's prototype.
+                //
+                // If you provide a function, as we do here, Polymer will call that
+                // _per element instance_.
+                //
+                // We do that to ensure that each element gets its own copy of the
+                // value, rather than having it shared across all instances (via the
+                // prototype).
+                value: function() {
+                    return {
+                        label: 'Local Person Name',
+                        host: 'Example Hosting',
+                        hosturl: 'http://opencoredata.org',
+                        url: 'http://opencoredata.org/id/dataset/650f47bb-9715-4f58-be51-0fab02af1b68',
+                    };
+                }
+            },
+        },
+        // Element Lifecycle
+        ready: function() {
+            // `ready` is called after all elements have been configured, but
+            // propagates bottom-up. This element's children are ready, but parents
+            // are not.
+            //
+            // This is the point where you should make modifications to the DOM (when
+            // necessary), or kick off any processes the element wants to perform.
+        },
+        attached: function() {
+            // `attached` fires once the element and its parents have been inserted
+            // into a document.
+            //
+            // This is a good place to perform any work related to your element's
+            // visual state or active behavior (measuring sizes, beginning animations,
+            // loading resources, etc).
+            this.deployments = '';
+        },
+        detached: function() {
+            // The analog to `attached`, `detached` fires when the element has been
+            // removed from a document.
+            //
+            // Use this to clean up anything you did in `attached`.
+        },
+        // Element Behavior
+        /**
+         * Should a template be shown (based on length of results)
+         */
+        showTemplate: function(results) {
+          return results ? 0 < results.length : false;
+        },
+        indexCounter: function(index) {
+          return index + 1;
+        },
+        handleTap: function(e, detail) {
+          $(e.target).parent().find('table').toggle();
+          if ($(e.target).hasClass('geolink-section-expanded')) {
+            $(e.target).removeClass('geolink-section-expanded');
+            $(e.target).addClass('geolink-section-collapsed');
+          }
+          else {
+            $(e.target).removeClass('geolink-section-collapsed');
+            $(e.target).addClass('geolink-section-expanded');
+          }
+        },
+        /**
+         * Get the SPARQL endpoint query string
+         */
+        getSPARQLRequestParams: function(query) {
+          var qs = "format=application%2Fsparql-results%2Bjson&timeout=0&query=" + encodeURIComponent(query);
+          return qs;
+        },
+        
+        getParam: function(parameter) {
+          return $.parseJSON($(this).attr('params'))[parameter];
+        },
+        getComponentQueryType: function() {
+          var type = this.getParam('type');
+          if (undefined == type) {
+            type = 'URI';
+          }
+          return type;
+        },
+        getTargetURIFromParams: function() {
+          return this.getParam('url');
+        },
+        getPidSchemeFromParams: function() {
+          return this.getParam('id_scheme');
+        },
+        getPidValueFromParams: function() {
+          return this.getParam('id_value');
+        }, 
+        getPersonSPARQLFragment: function() {
+          var queryType = this.getComponentQueryType();
+          switch (queryType) {
+              case 'PID':
+                  var pidScheme = this.getPidSchemeFromParams();
+                  var pidValue = this.getPidValueFromParams();
+    
+                  return "?target gl:hasIdentifier ?identifier . " + 
+                        "?identifier rdf:type gl:Identifier . " + 
+                        "?identifier gl:hasIdentifierScheme <"+pidScheme+"> ." +
+                        "?identifier gl:hasIdentifierValue ?pid_value . FILTER (str(?pid_value) = \""+pidValue+"\") ";                                                     ;
+                  
+                  break;
+                  
+              case 'URI':
+              default:
+                  var targetURI = this.getTargetURIFromParams();
+                  return "VALUES ?target {<"+targetURI+">} " +
+                      "{ ?person owl:sameAs ?target . } ";
+                  break;
+              
+          }
+        },
+        getPublicationName: function(publication, index) {
+          var name = this.indexCounter(index) + '. ';
+          var url = publication.publication.value;
+          if (publication.url && publication.url.value.trim()) {
+            url = publication.url.value;
+          }
+          var title = (publication.title && publication.title.value.trim()) ? publication.title.value 
+                   : (publication.alt_title && publication.alt_title.value.trim()) ? publication.alt_title.value 
+                   : url;
+          var type = (publication.pub_type && publication.pub_type.value.trim()) ? publication.pub_type.value : '';
+          return '<a href="' + url + '" target="_blank">' + title + '</a>' + (type ? " (" + type + ")" : '');
+        },
+        getPublicationType: function(publication) {
+          return (publication.type && publication.type.value.trim()) ? publication.type.value : '';
+        },
+        getPublicationAbstract: function(publication) {
+          return (publication.abstract && publication.abstract.value.trim()) ? publication.abstract.value : '';
+        },
+        getPublicationRole: function(publication) {
+          return (publication.role && publication.role.value.trim()) 
+            ? '<a href="' + publication.role.value + '">' + publication.role.value + '</a>'
+            : '';
+        },
+        getPublicationsQuery: function () {
+          var query = "PREFIX gl: <http://schema.geolink.org/1.0/base/main#> " +
+          "SELECT DISTINCT ?publication ?role ?title ?alt_title ?pub_type " +
+          "WHERE { " +
+            "?person a gl:Person . " +            
+            "{ SELECT DISTINCT ?person " +
+              "WHERE { " +
+                "{ ?target owl:sameAs ?person . } " +
+                "UNION { ?target owl:sameAs ?match . ?match owl:sameAs ?person . } " +
+                "UNION { ?target owl:sameAs ?match . ?person owl:sameAs ?match . } " +
+                "UNION { ?person a gl:Person . FILTER (?person = ?target) } " +
+                this.getPersonSPARQLFragment() +
+              "} } " +
+            "?publication a gl:Document . " +
+            "{ ?publication gl:hasPart ?digital_object . " +
+              "?digital_object a gl:DigitalObject .  " +
+              "?digital_object ?role ?person . " +
+            "} UNION { " +
+              "?publication ?role ?person . " +
+            "} " +
+            "OPTIONAL { ?publication gl:hasTitle ?title . } " +
+            "OPTIONAL { ?publication gl:title ?alt_title . } " +
+            "OPTIONAL { ?publication gl:hasDocumentType ?pub_type . } " +
+          "}";
+          return this.getSPARQLRequestParams(query);
+        },
+        handleCruiseInfoResponse: function(response) {
+          var bindings = response.detail.response.results.bindings;
+          var items = [];
+          var index = 0;
+          $.each(bindings, function (idx, data) {
+            if (data.cruise.value.includes('lod.bco-dmo.org')) {
+              return true;
+            }
+            items[index] = new Object();
+            items[index].name = (1 + index) + '. ';
+            if (data.cruise_title && data.cruise_title.value.trim()) {
+              items[index] += '<a href="' + data.cruise.value + '" target="_blank">' + data.cruise_title.value + '</a><br/>';
+            }
+            else if (data.cruise_label && data.cruise_label.value.trim()) {
+              items[index].name += '<a href="' + data.cruise.value + '" target="_blank">' + data.cruise_label.value + '</a><br/>';
+            }
+            if (data.role && data.role.value.trim()) {
+              items[index].role = data.role.value;
+            }
+            if (data.id_value && data.id_value.value.trim()) {
+              items[index].id = '';
+              var id_url = '';
+              if (data.id_uri && data.id_uri.value.trim()) {
+                id_url = data.id_uri.value;
+              }
+              else if (data.id_scheme && data.id_scheme.value.trim()) {
+                switch (data.id_scheme.value) {
+                  case 'http://purl.org/spar/datacite/doi':
+                    id_url = 'http://doi.org/' + data.id_value.value;
+                    break;
+                }
+              }
+              if (id_url.trim()) {
+                items[index].id += '<a href="' + id_url + '" target="_blank">' + data.id_value.value + '</a><br/>';
+              }
+              else {
+                items[index].id += data.id_value.value + '</br>';
+              }
+            }
+            if (data.start_port && data.start_port.value.trim()) {
+              items[index].start_port = '';
+              if (data.start_port_name && data.start_port_name.value.trim()) {
+                items[index].start_port += data.start_port_name.value + ' ';
+              }
+              else {
+                //items[index].start_port += '<em style="font-size: small">unspecified port</em> ';
+              }
+              if (data.start_port_date && data.start_port_date.value.trim()) {
+                items[index].start_port += '(' + data.start_port_date.value + ')';
+              }
+              else {
+                //items[index].start_port += '<em style="font-size: smaller">(unspecified date)</em>';
+              }
+              items[index].start_port += '<br/>';
+            }
+            if (data.end_port && data.end_port.value.trim()) {
+              items[index].end_port = '';
+              if (data.end_port_name && data.end_port_name.value.trim()) {
+                items[index].end_port += data.end_port_name.value + ' ';
+              }
+              else {
+                //items[index].end_port += '<em style="font-size: small">unspecified port</em> ';
+              }
+              if (data.end_port_date && data.end_port_date.value.trim()) {
+                items[index].end_port += '(' + data.end_port_date.value + ')';
+              }
+              else {
+                //items[index].end_port += '<em style="font-size: smaller">(unspecified date)</em>';
+              }
+              items[index].end_port += '<br/>';
+              index++;
+            }
+          });
+          this.deployments = items;
+        },
+        getCruiseInfo: function(index, property) {
+          return this.deployments[index][property];
+        },
+        getCruiseQuery: function () {
+          var targetURI = this.getTargetURIFromParams();
+          var query = "PREFIX gl: <http://schema.geolink.org/1.0/base/main#> " +
+          "SELECT DISTINCT ?cruise ?role ?cruise_title ?cruise_label ?id_value ?id_scheme ?id_uri ?start_port ?start_port_date ?start_port_name ?end_port ?end_port_date ?end_port_name " +
+          "WHERE { ?cruise a gl:Cruise . " +
+            "{ ?person a gl:Person . ?person ?role ?cruise . " +
+              "{ SELECT DISTINCT ?person " +
+                "WHERE { " +
+                  "VALUES ?target {<"+targetURI+">} " +
+                  "{ ?person a gl:Person . ?person owl:sameAs ?target . } " +
+                  "UNION { ?person a gl:Person . ?target owl:sameAs ?person . } " +
+                  "UNION { ?person a gl:Person . ?target owl:sameAs ?match . ?match owl:sameAs ?person . } " +
+                  "UNION { ?person a gl:Person . ?target owl:sameAs ?match . ?person owl:sameAs ?match . } " +
+                  "UNION { ?person a gl:Person . FILTER (?person = ?target) } " +
+                "} } " +
+            "} UNION { " +
+              "?person a gl:Person . ?cruise ?role ?person . " +
+              "{ SELECT DISTINCT ?person " +
+                "WHERE { " +
+                  "VALUES ?target {<"+targetURI+">} " +
+                  "{ ?person a gl:Person . ?person owl:sameAs ?target . } " +
+                  "UNION { ?person a gl:Person . ?target owl:sameAs ?person . } " +
+                  "UNION { ?person a gl:Person . ?target owl:sameAs ?match . ?match owl:sameAs ?person . } " +
+                  "UNION { ?person a gl:Person . ?target owl:sameAs ?match . ?person owl:sameAs ?match . } " +
+                  "UNION { ?person a gl:Person . FILTER (?person = ?target) } " +
+                "} } " +
+            "} " +
+            "FILTER(REGEX(?role, 'geolink')) " +
+            "OPTIONAL { ?cruise gl:hasTitle ?cruise_title . } " +
+            "OPTIONAL { ?cruise rdfs:label ?cruise_label . } " +
+            "OPTIONAL { ?cruise gl:hasIdentifier ?identifier . ?identifier gl:hasIdentifierValue ?id_value . " +
+              "OPTIONAL { ?identifier gl:hasIdentifierScheme ?id_scheme . } " +
+              "OPTIONAL { ?identifier gl:hasIdentifierResolveURI ?id_uri . } " +
+            "} " +
+            "OPTIONAL { ?cruise gl:hasStartPortCall ?start_port . " +
+              "OPTIONAL { ?start_port gl:hasTimeStamp ?start_port_date . } " +
+              "OPTIONAL { ?start_port gl:atPort [ rdfs:label ?start_port_name ] . } " +
+            "} " +
+            "OPTIONAL { ?cruise gl:hasEndPortCall ?end_port . " +
+              "OPTIONAL { ?end_port gl:hasTimeStamp ?end_port_date . } " +
+              "OPTIONAL { ?end_port gl:atPort [ rdfs:label ?end_port_name ] . } " +
+            "} " +
+          "}";
+          return this.getSPARQLRequestParams(query);
+        },
+        /**
+         * Get the Award SPARQL query
+         */
+        getAwardQuery: function() {
+          var targetURI = this.getTargetURIFromParams();
+          var query = "PREFIX gl: <http://schema.geolink.org/1.0/base/main#> " +
+          "SELECT DISTINCT ?person ?award ?award_title ?abstract ?start ?end ?sponsor_name (group_concat(distinct ?org_name;separator=\":::\") as ?sub_sponsor_names) ?match ?id_value ?id_scheme ?id_uri " +
+          "WHERE { " +
+            "{ ?award a gl:Award . ?cruise gl:hasAward ?award . ?cruise a gl:Cruise . ?person ?pred ?cruise . " +
+              "{ SELECT DISTINCT ?person " +
+                "WHERE { " +
+                  "VALUES ?target {<"+targetURI+">} " +
+                  "{ ?person a gl:Person . ?person owl:sameAs ?target . } " +
+                  "UNION { ?person a gl:Person . ?target owl:sameAs ?person . } " +
+                  "UNION { ?person a gl:Person . ?target owl:sameAs ?match . ?match owl:sameAs ?person . } " +
+                  "UNION { ?person a gl:Person . ?target owl:sameAs ?match . ?person owl:sameAs ?match . } " +
+                  "UNION { ?person a gl:Person . FILTER (?person = ?target) } " +
+                "} } " +
+            "} UNION { " +
+              "?award a gl:Award . ?award ?role ?person . " +
+              "{ SELECT DISTINCT ?person " +
+                "WHERE { " +
+                  "VALUES ?target {<"+targetURI+">} " +
+                  "{ ?person a gl:Person . ?person owl:sameAs ?target . } " +
+                  "UNION { ?person a gl:Person . ?target owl:sameAs ?person . } " +
+                  "UNION { ?person a gl:Person . ?target owl:sameAs ?match . ?match owl:sameAs ?person . } " +
+                  "UNION { ?person a gl:Person . ?target owl:sameAs ?match . ?person owl:sameAs ?match . } " +
+                  "UNION { ?person a gl:Person . FILTER (?person = ?target) } " +
+                "} } " +
+            "} " +
+            "OPTIONAL { ?award gl:hasTitle ?award_title . } " +
+            "OPTIONAL { ?award gl:hasIdentifier ?identifier . ?identifier gl:hasIdentifierValue ?id_value . " +
+              "OPTIONAL { ?identifier gl:hasIdentifierScheme ?id_scheme . } " +
+              "OPTIONAL { ?identifier gl:hasIdentifierResolveURI ?id_uri . } " +
+            "} " +
+            "OPTIONAL { ?award gl:hasAbstract ?abstract . } " +
+            "OPTIONAL { ?award gl:hasStartDate ?start . } " +
+            "OPTIONAL { ?award gl:hasEndDate ?end . } " +
+            "OPTIONAL { ?award gl:hasSponsor ?sponsor . ?sponsor gl:hasTitle ?sponsor_name . " +
+              "OPTIONAL { ?org gl:hasSubOrganization+ ?sponsor . ?org gl:hasTitle ?org_name . } " +
+            "} " +
+            "OPTIONAL { ?award owl:sameAs ?match . ?match a gl:Award . } } " +
+            "ORDER BY ?award_title ?sponsor_name ?start ?end";
+          return this.getSPARQLRequestParams(query);
+        },
+        /**
+         * For a GeoLink Award, compute the text for displaying its Sponsor.
+         */
+        computeAwardSponsor: function(award) {
+          var sponsor = award.sponsor_name ? award.sponsor_name.value : '';
+          if (award.sub_sponsor_names && award.sub_sponsor_names.value.trim()) {
+            var sub_sponsors = award.sub_sponsor_names.value.trim().split(':::');
+            $.each(sub_sponsors, function (index, value) {
+              sponsor = value + ': ' + sponsor;
+            });
+          }
+          return sponsor;
+        },
+    });
+  </script>
+</dom-module>
